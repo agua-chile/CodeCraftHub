@@ -39,8 +39,8 @@ app.use('/api/users', userRoutes);
 // Centralized error handling middleware
 app.use(errorHandler);
 
-// Start the server
-const PORT = process.env.PORT || 5000;  // Default to port 5000 if not specified
+// Start the server and listen on all interfaces (needed for Docker/proxy)
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 /**
