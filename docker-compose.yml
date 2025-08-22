@@ -1,0 +1,48 @@
+# ============================================================================
+# Docker Compose file for CodeCraftHub
+# ------------------------------------
+# This file defines two services:
+#   1. user-service: The Node.js backend application
+#   2. mongo:       The MongoDB database (local container, optional)
+#
+# All configuration values are loaded from the .env file in the project root.
+#
+# Usage:
+#   - Set environment variables in your .env file (see below for example).
+#   - Build and start services: docker-compose up --build
+#   - The app will be available at http://localhost:${PORT}
+#
+# Example .env:
+#   MONGO_HOST=172.21.7.123
+#   MONGO_PWD=g1y6BhdH1YNG4DVeKKOa4Yf2
+#   MONGO_URI=mongodb://root:${MONGO_PWD}@${MONGO_HOST}:27017/usermngtservice?authSource=admin
+#   PORT=5000
+#   JWT_SECRET=secret
+# ============================================================================
+
+version: '3.8'
+
+services:
+  user-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT}:${PORT}"  # Map host port to container port (from .env)
+    environment:
+      MONGO_URI: ${MONGO_URI}      # MongoDB connection string from .env
+      JWT_SECRET: ${JWT_SECRET}    # JWT secret from .env
+      PORT: ${PORT}                # App port from .env
+    depends_on:
+      - mongo                      # Wait for MongoDB to be ready
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"              # Expose MongoDB port
+    # No need to set env vars here if connecting to an external host
+    volumes:
+      - mongo-data:/data/db        # Persist MongoDB data locally
+
+volumes:
+  mongo-data:                      # Named volume for MongoDB data persistence
